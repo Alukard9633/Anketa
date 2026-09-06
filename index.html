@@ -98,9 +98,147 @@ footer{padding:28px 0;color:var(--muted);font-size:13px;text-align:center}
 </main>
 
 <footer>© 2026 Знайомства UA · Безпека та повага понад усе</footer>
-<script>
-function join(){alert('Форма реєстрації буде підключена на наступному етапі.');}
-function findPeople(){document.getElementById('people').scrollIntoView({behavior:'smooth'});}
-</script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  updateProfile
+} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA99roziSWRQSe0qJzNoNPFr6OwulFdsoM",
+  authDomain: "znayomstva-ua.firebaseapp.com",
+  projectId: "znayomstva-ua",
+  storageBucket: "znayomstva-ua.firebasestorage.app",
+  messagingSenderId: "436610809685",
+  appId: "1:436610809685:web:32a2cb546b9fb3715e79dc",
+  measurementId: "G-LE66XD27N1"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+window.join = function() {
+  const old = document.getElementById("register-modal");
+  if (old) old.remove();
+
+  const modal = document.createElement("div");
+  modal.id = "register-modal";
+
+  modal.innerHTML = `
+    <div style="
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.65);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index:99999;
+      padding:20px;
+    ">
+      <div style="
+        background:white;
+        color:#222;
+        width:100%;
+        max-width:420px;
+        border-radius:20px;
+        padding:25px;
+        box-sizing:border-box;
+        box-shadow:0 10px 40px rgba(0,0,0,.3);
+      ">
+        <h2 style="margin-top:0;">Створити анкету</h2>
+
+        <input id="reg-name"
+          type="text"
+          placeholder="Твоє ім'я"
+          style="width:100%;padding:13px;margin:7px 0;box-sizing:border-box;border-radius:10px;border:1px solid #ccc;">
+
+        <input id="reg-email"
+          type="email"
+          placeholder="Email"
+          style="width:100%;padding:13px;margin:7px 0;box-sizing:border-box;border-radius:10px;border:1px solid #ccc;">
+
+        <input id="reg-password"
+          type="password"
+          placeholder="Пароль (мінімум 6 символів)"
+          style="width:100%;padding:13px;margin:7px 0;box-sizing:border-box;border-radius:10px;border:1px solid #ccc;">
+
+        <button id="reg-submit"
+          style="width:100%;padding:14px;margin-top:10px;border:0;border-radius:10px;background:#e83e8c;color:white;font-size:16px;font-weight:bold;">
+          Зареєструватися
+        </button>
+
+        <button id="reg-close"
+          style="width:100%;padding:12px;margin-top:8px;border:0;background:transparent;color:#777;">
+          Скасувати
+        </button>
+
+        <div id="reg-message" style="margin-top:12px;text-align:center;"></div>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  document.getElementById("reg-close").onclick = () => modal.remove();
+
+  document.getElementById("reg-submit").onclick = async () => {
+    const name = document.getElementById("reg-name").value.trim();
+    const email = document.getElementById("reg-email").value.trim();
+    const password = document.getElementById("reg-password").value;
+    const message = document.getElementById("reg-message");
+
+    if (!name || !email || !password) {
+      message.textContent = "Заповни всі поля.";
+      message.style.color = "red";
+      return;
+    }
+
+    if (password.length < 6) {
+      message.textContent = "Пароль має містити щонайменше 6 символів.";
+      message.style.color = "red";
+      return;
+    }
+
+    try {
+      const userCredential =
+        await createUserWithEmailAndPassword(auth, email, password);
+
+      await updateProfile(userCredential.user, {
+        displayName: name
+      });
+
+      message.textContent = "Реєстрація успішна! 🎉";
+      message.style.color = "green";
+
+      setTimeout(() => {
+        modal.remove();
+      }, 1200);
+
+    } catch (error) {
+      console.error(error);
+
+      if (error.code === "auth/email-already-in-use") {
+        message.textContent = "Цей email вже зареєстрований.";
+      } else if (error.code === "auth/invalid-email") {
+        message.textContent = "Введи правильний email.";
+      } else if (error.code === "auth/weak-password") {
+        message.textContent = "Пароль занадто слабкий.";
+      } else {
+        message.textContent = "Помилка реєстрації. Спробуй ще раз.";
+      }
+
+      message.style.color = "red";
+    }
+  };
+};
+
+window.findPeople = function() {
+  document.getElementById("people").scrollIntoView({
+    behavior: "smooth"
+  });
+};
+    </script>
 </body>
 </html>
