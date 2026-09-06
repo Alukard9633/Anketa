@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://alukard9633.github.io/Anketa/sitemap.xml
