@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Знайомства UA — український сайт знайомств. Створюй анкету, знаходь людей та спілкуйся.">
+<meta name="robots" content="index,follow">
+<title>Знайомства UA — сайт знайомств</title>
+<style>
+:root{--bg:#f6f7fb;--card:#fff;--text:#202333;--muted:#70758a;--primary:#6d4aff;--primary2:#8b5cf6;--danger:#e5484d;--line:#e7e8ef}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
+button,input,select,textarea{font:inherit}button{cursor:pointer;border:0}.hidden{display:none!important}
+header{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--line)}
+.header{max-width:1100px;margin:auto;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.logo{font-weight:800;font-size:20px;color:var(--primary);text-decoration:none}.user-mini{display:flex;align-items:center;gap:9px}
+.avatar{width:38px;height:38px;border-radius:50%;object-fit:cover;background:#eee;display:grid;place-items:center;font-weight:700}
+.nav{max-width:1100px;margin:auto;padding:0 16px 10px;display:flex;gap:7px;overflow:auto}.nav button{background:transparent;padding:9px 12px;border-radius:10px;color:var(--muted);white-space:nowrap}.nav button.active,.nav button:hover{background:#f0edff;color:var(--primary)}
+main{max-width:1100px;margin:0 auto;padding:22px 16px 90px}.hero{text-align:center;padding:55px 16px}.hero h1{font-size:clamp(30px,6vw,52px);margin:0 0 12px}.hero p{color:var(--muted);font-size:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 5px 22px #2023330b}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px}.profile-card{overflow:hidden;padding:0}.profile-card img{width:100%;height:270px;object-fit:cover;background:#eee}.profile-body{padding:15px}.muted{color:var(--muted)}.actions{display:flex;gap:9px;flex-wrap:wrap}.btn{padding:11px 16px;border-radius:11px;background:#eee;color:var(--text);font-weight:650}.btn.primary{background:var(--primary);color:#fff}.btn.google{background:#fff;border:1px solid var(--line)}.btn.danger{background:#fff0f0;color:var(--danger)}
+form{display:grid;gap:12px}.field{display:grid;gap:6px}.field label{font-weight:650;font-size:14px}.field input,.field select,.field textarea{width:100%;padding:12px 13px;border:1px solid #dfe1e9;border-radius:11px;outline:0;background:#fff}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--primary)}.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.auth{max-width:470px;margin:35px auto}.auth h2{margin-top:0}.sep{text-align:center;color:var(--muted);margin:8px 0}
+.notice{padding:12px 14px;border-radius:11px;background:#f0edff;color:#4e3aa8;margin-bottom:14px}.error{background:#fff0f0;color:#b4232a}.success{background:#effaf1;color:#24753a}
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px}.section-head h2{margin:0}
+.empty{text-align:center;padding:40px 15px;color:var(--muted)}
+.modal{position:fixed;inset:0;background:#0008;display:grid;place-items:center;padding:16px;z-index:30}.modal .card{width:min(520px,100%);max-height:90vh;overflow:auto}
+footer{text-align:center;color:var(--muted);padding:25px}
+@media(max-width:600px){.two{grid-template-columns:1fr}.hero{padding:35px 8px}.profile-card img{height:300px}.header{padding:10px 12px}main{padding:16px 12px 80px}}
+</style>
+</head>
+<body>
+<header id="header" class="hidden">
+  <div class="header">
+    <a class="logo" href="#" onclick="showPage('search');return false">Знайомства UA</a>
+    <div class="user-mini"><span id="headerName"></span><img id="headerAvatar" class="avatar" alt=""></div>
+  </div>
+  <nav class="nav">
+    <button data-page="search" onclick="showPage('search')">🔎 Пошук</button>
+    <button data-page="likes" onclick="showPage('likes')">❤️ Вподобання</button>
+    <button data-page="profile" onclick="showPage('profile')">👤 Мій профіль</button>
+    <button data-page="settings" onclick="showPage('settings')">⚙️ Налаштування</button>
+  </nav>
+</header>
+
+<main>
+<section id="landing" class="hero">
+  <h1>Знайомства UA ❤️</h1>
+  <p>Знайомся, знаходь однодумців та спілкуйся.</p>
+  <div class="actions" style="justify-content:center;margin-top:22px">
+    <button class="btn primary" onclick="showPage('register')">Створити анкету</button>
+    <button class="btn" onclick="showPage('login')">Увійти</button>
+  </div>
+</section>
+
+<section id="login" class="auth card hidden">
+  <h2>Вхід</h2><div id="loginMsg"></div>
+  <form onsubmit="login(event)">
+    <div class="field"><label>Email</label><input id="loginEmail" type="email" required autocomplete="email"></div>
+    <div class="field"><label>Пароль</label><input id="loginPassword" type="password" required autocomplete="current-password"></div>
+    <button class="btn primary" type="submit">Увійти</button>
+    <button class="btn google" type="button" onclick="googleLogin()">🔵 Увійти через Google</button>
+  </form>
+  <p class="muted">Немає акаунта? <a href="#" onclick="showPage('register');return false">Зареєструватися</a></p>
+</section>
+
+<section id="register" class="auth card hidden">
+  <h2>Створити анкету</h2><div id="registerMsg"></div>
+  <form onsubmit="register(event)">
+    <div class="field"><label>Ім'я</label><input id="regName" required maxlength="40"></div>
+    <div class="two">
+      <div class="field"><label>Вік</label><input id="regAge" type="number" min="18" max="100" required></div>
+      <div class="field"><label>Місто</label><input id="regCity" maxlength="60" required></div>
+    </div>
+    <div class="field"><label>Про себе</label><textarea id="regBio" rows="4" maxlength="500" placeholder="Коротко про себе"></textarea></div>
+    <div class="field"><label>Email</label><input id="regEmail" type="email" required autocomplete="email"></div>
+    <div class="field"><label>Пароль (мінімум 6 символів)</label><input id="regPassword" type="password" minlength="6" required autocomplete="new-password"></div>
+    <button class="btn primary" type="submit">Зареєструватися</button>
+    <button class="btn google" type="button" onclick="googleRegister()">🔵 Продовжити через Google</button>
+  </form>
+  <p class="muted">Вже є акаунт? <a href="#" onclick="showPage('login');return false">Увійти</a></p>
+</section>
+
+<section id="search" class="hidden">
+  <div class="section-head"><h2>Знайомства</h2><button class="btn" onclick="loadPeople()">Оновити</button></div>
+  <div class="card" style="margin-bottom:16px">
+    <div class="two">
+      <div class="field"><label>Місто</label><input id="filterCity" placeholder="Наприклад, Київ"></div>
+      <div class="field"><label>Максимальний вік</label><input id="filterAge" type="number" min="18" max="100" value="100"></div>
+    </div>
+    <button class="btn primary" style="margin-top:12px" onclick="loadPeople()">Знайти</button>
+  </div>
+  <div id="people" class="grid"></div>
+</section>
+
+<section id="likes" class="hidden">
+  <div class="section-head"><h2>Мої вподобання</h2></div>
+  <div id="likesList" class="grid"></div>
+</section>
+
+<section id="profile" class="hidden">
+  <div class="section-head"><h2>Мій профіль</h2></div>
+  <div id="profileBox"></div>
+</section>
+
+<section id="settings" class="hidden">
+  <div class="card">
+    <h2>Налаштування</h2>
+    <p class="muted">Керування акаунтом</p>
+    <button class="btn danger" onclick="logout()">Вийти з акаунта</button>
+  </div>
+</section>
+</main>
+<footer>© <span id="year"></span> Знайомства UA</footer>
+<div id="modal" class="modal hidden"><div class="card"><div id="modalContent"></div><button class="btn" onclick="closeModal()" style="margin-top:12px">Закрити</button></div></div>
+
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
+import {getAnalytics} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-analytics.js";
+import {getAuth,onAuthStateChanged,createUserWithEmailAndPassword,signInWithEmailAndPassword,GoogleAuthProvider,signInWithPopup,signOut,updateProfile} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+import {getFirestore,doc,setDoc,getDoc,collection,getDocs,query,where,orderBy,limit,serverTimestamp,arrayUnion,arrayRemove,updateDoc} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
+
+const firebaseConfig={apiKey:"AIzaSyA99roziSWRQSe0qJzNoNPFr6OwulFdsoM",authDomain:"znayomstva-ua.firebaseapp.com",projectId:"znayomstva-ua",storageBucket:"znayomstva-ua.firebasestorage.app",messagingSenderId:"436610809685",appId:"1:436610809685:web:32a2cb546b9fb3715e79dc",measurementId:"G-LE66XD27N1"};
+const app=initializeApp(firebaseConfig); try{getAnalytics(app)}catch(e){}
+const auth=getAuth(app), db=getFirestore(app), provider=new GoogleAuthProvider();
+let currentUser=null,currentProfile=null;
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+function msg(id,text,type="notice"){ $(id).innerHTML=`<div class="${type} notice">${esc(text)}</div>`; }
+function friendly(e){const c=e?.code||"";return ({ "auth/email-already-in-use":"Цей email вже зареєстрований.","auth/invalid-credential":"Неправильний email або пароль.","auth/invalid-email":"Некоректний email.","auth/weak-password":"Пароль занадто слабкий.","auth/popup-closed-by-user":"Вікно входу було закрито.","auth/popup-blocked":"Браузер заблокував вікно Google.","permission-denied":"Firebase заборонив доступ до даних. Перевір правила Firestore."}[c]||e?.message||"Сталася помилка.");
+}
+window.showPage=showPage; window.login=login; window.register=register; window.googleLogin=googleLogin; window.googleRegister=googleRegister; window.logout=()=>signOut(auth); window.loadPeople=loadPeople; window.closeModal=closeModal;
+window.showPage=page=>{
+  const allowed=["landing","login","register","search","likes","profile","settings"];
+  allowed.forEach(x=>$(x).classList.toggle("hidden",x!==page));
+  document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===page));
+  window.scrollTo({top:0,behavior:"smooth"});
+  if(page==="search"&&currentUser) loadPeople();
+  if(page==="likes"&&currentUser) loadLikes();
+  if(page==="profile"&&currentUser) renderProfile();
+};
+async function saveProfile(user,data){await setDoc(doc(db,"users",user.uid),{...data,email:user.email||"",updatedAt:serverTimestamp()},{merge:true})}
+async function getProfile(user){const s=await getDoc(doc(db,"users",user.uid));return s.exists()?s.data():null}
+
+async function register(e){
+ e.preventDefault(); msg("registerMsg","Створюємо акаунт…");
+ try{
+  const cred=await createUserWithEmailAndPassword(auth,$("regEmail").value.trim(),$("regPassword").value);
+  await updateProfile(cred.user,{displayName:$("regName").value.trim()});
+  await saveProfile(cred.user,{name:$("regName").value.trim(),age:Number($("regAge").value),city:$("regCity").value.trim(),bio:$("regBio").value.trim(),photoURL:"",likes:[]});
+  showPage("search");
+ }catch(err){msg("registerMsg",friendly(err),"error")}
+}
+async function login(e){
+ e.preventDefault(); msg("loginMsg","Входимо…");
+ try{await signInWithEmailAndPassword(auth,$("loginEmail").value.trim(),$("loginPassword").value);showPage("search")}catch(err){msg("loginMsg",friendly(err),"error")}
+}
+async function googleLogin(){await googleAuth()}
+async function googleRegister(){await googleAuth()}
+async function googleAuth(){
+ try{
+  const cred=await signInWithPopup(auth,provider), p=await getProfile(cred.user);
+  if(!p) await saveProfile(cred.user,{name:cred.user.displayName||"Користувач",age:18,city:"",bio:"",photoURL:cred.user.photoURL||"",likes:[]});
+  showPage("search");
+ }catch(err){alert(friendly(err))}
+}
+
+onAuthStateChanged(auth,async user=>{
+ currentUser=user;
+ if(user){
+  currentProfile=await getProfile(user);
+  if(!currentProfile){currentProfile={name:user.displayName||"Користувач",age:18,city:"",bio:"",photoURL:user.photoURL||"",likes:[]};await saveProfile(user,currentProfile)}
+  $("header").classList.remove("hidden"); $("headerName").textContent=currentProfile.name||user.displayName||"";
+  $("headerAvatar").src=currentProfile.photoURL||user.photoURL||"";
+  if($("landing").classList.contains("hidden")===false) showPage("search");
+ }else{
+  currentProfile=null;$("header").classList.add("hidden");showPage("landing");
+ }
+});
+
+async function loadPeople(){
+ const box=$("people");box.innerHTML='<div class="card">Завантажуємо анкети…</div>';
+ try{
+  const snap=await getDocs(query(collection(db,"users"),limit(100)));
+  const city=$("filterCity").value.trim().toLowerCase(), max=Number($("filterAge").value||100);
+  const arr=[];snap.forEach(s=>{const p=s.data();if(s.id!==currentUser?.uid&&(!city||String(p.city||"").toLowerCase().includes(city))&&Number(p.age||0)<=max)arr.push({id:s.id,...p})});
+  if(!arr.length){box.innerHTML='<div class="card empty">Поки що підходящих анкет немає. Спробуйте змінити фільтри.</div>';return}
+  box.innerHTML=arr.map(card).join("");
+ }catch(e){box.innerHTML=`<div class="notice error">${esc(friendly(e))}<br><small>Якщо це permission-denied — потрібно налаштувати правила Firestore.</small></div>`}
+}
+function card(p){
+ const photo=p.photoURL?`<img src="${esc(p.photoURL)}" alt="${esc(p.name)}" loading="lazy">`:`<div style="height:270px;display:grid;place-items:center;font-size:70px;background:#eee">👤</div>`;
+ return `<article class="card profile-card">${photo}<div class="profile-body"><h3>${esc(p.name||"Користувач")}${p.age?`, ${esc(p.age)}`:""}</h3><div class="muted">${esc(p.city||"")}</div><p>${esc(p.bio||"")}</p><div class="actions"><button class="btn primary" onclick="likeUser('${p.id}')">❤️ Подобається</button><button class="btn" onclick="viewUser('${p.id}')">Переглянути</button></div></div></article>`;
+}
+window.likeUser=async id=>{
+ try{await updateDoc(doc(db,"users",currentUser.uid),{likes:arrayUnion(id)});alert("Додано до вподобань ❤️")}catch(e){alert(friendly(e))}
+}
+window.viewUser=async id=>{
+ const s=await getDoc(doc(db,"users",id));if(!s.exists())return;
+ const p=s.data();$("modalContent").innerHTML=`<h2>${esc(p.name||"Користувач")}${p.age?`, ${esc(p.age)}`:""}</h2><p class="muted">${esc(p.city||"")}</p>${p.photoURL?`<img src="${esc(p.photoURL)}" style="width:100%;max-height:420px;object-fit:cover;border-radius:12px">`:""}<p>${esc(p.bio||"Анкета ще не заповнена.")}</p>`;
+ $("modal").classList.remove("hidden");
+}
+function closeModal(){$("modal").classList.add("hidden")}
+async function loadLikes(){
+ const box=$("likesList");box.innerHTML='<div class="card">Завантажуємо…</div>';
+ try{
+  const ids=currentProfile?.likes||[];if(!ids.length){box.innerHTML='<div class="card empty">Ви ще нікого не вподобали.</div>';return}
+  const arr=[];for(const id of ids){const s=await getDoc(doc(db,"users",id));if(s.exists())arr.push({id,...s.data()})}
+  box.innerHTML=arr.length?arr.map(card).join(""):'<div class="card empty">Анкети більше недоступні.</div>';
+ }catch(e){box.innerHTML=`<div class="notice error">${esc(friendly(e))}</div>`}
+}
+async function renderProfile(){
+ const p=currentProfile||await getProfile(currentUser)||{};$("profileBox").innerHTML=`<div class="card"><form onsubmit="saveMyProfile(event)">
+ <div class="field"><label>Ім'я</label><input id="pName" value="${esc(p.name||"")}" required maxlength="40"></div>
+ <div class="two"><div class="field"><label>Вік</label><input id="pAge" type="number" min="18" max="100" value="${Number(p.age||18)}" required></div><div class="field"><label>Місто</label><input id="pCity" value="${esc(p.city||"")}" maxlength="60"></div></div>
+ <div class="field"><label>Посилання на фото</label><input id="pPhoto" type="url" value="${esc(p.photoURL||"")}" placeholder="https://..."></div>
+ <div class="field"><label>Про себе</label><textarea id="pBio" rows="5" maxlength="500">${esc(p.bio||"")}</textarea></div>
+ <button class="btn primary" type="submit">Зберегти профіль</button></form></div>`}
+window.saveMyProfile=async e=>{
+ e.preventDefault();try{
+  const p={name:$("pName").value.trim(),age:Number($("pAge").value),city:$("pCity").value.trim(),photoURL:$("pPhoto").value.trim(),bio:$("pBio").value.trim()};
+  await saveProfile(currentUser,p);currentProfile={...currentProfile,...p};$("headerName").textContent=p.name;$("headerAvatar").src=p.photoURL||"";alert("Профіль збережено ✅");showPage("profile");
+ }catch(e){alert(friendly(e))}
+}
+$("year").textContent=new Date().getFullYear();
+</script>
+</body>
+</html>
